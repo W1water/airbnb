@@ -20,7 +20,7 @@ public class LowestPriceController {
 
     @GetMapping("by_neighbourhood")
     @ResponseBody
-    public List<Map<String, Object>> listUvMonth(HttpServletRequest request) {
+    public List<Map<String, Object>> ListMinPriceNeighbourhood(HttpServletRequest request) {
 
         String root_type="'"+request.getParameter("room_type")+"%'";
         String startDt ="'"+ request.getParameter("startDt")+"'";
@@ -36,5 +36,18 @@ public class LowestPriceController {
         List<Map<String, Object>> results = jdbcTemplate.queryForList(sql);
         return results;
     }
+    @GetMapping("by_date_365")
+    @ResponseBody
+    public List<Map<String, Object>> ListMinPriceDate(HttpServletRequest request) {
 
+        String neighbourhood="'"+ request.getParameter("neighbourhood")+"%'";
+        String root_type="'"+request.getParameter("room_type")+"%'";
+
+
+        String sql = "select dt,min(price) min_price_by_day from calendar a join \n" +
+                "(select id from listing where neighbourhood like "+neighbourhood+" and room_type like "+root_type+"    ) b\n" +
+                "on a.listing_id=b.id where available='t' group by dt";
+        List<Map<String, Object>> results = jdbcTemplate.queryForList(sql);
+        return results;
+    }
 }
